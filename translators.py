@@ -4,9 +4,9 @@ import requests, uuid
 import torch
 import ast
 from easynmt import EasyNMT
+import pandas as pd
 from itranslate import itranslate
-
-from config import wsi_2010_path, wsi_2013_path
+from Naked.toolshed.shell import muterun_js
 
 
 def get_easynmt_model(
@@ -23,7 +23,7 @@ def get_unofficial_google_translate(
     text: str,
     source_lang: Enum,
     target_lang: Enum
-) -> Callable:
+) -> str:
     return itranslate(text, from_lang=source_lang, to_lang=target_lang)
 
 
@@ -31,7 +31,7 @@ def get_microsoft_translate(
     text: str,
     source_lang: Enum,
     target_lang: Enum
-) -> Callable:
+) -> str:
     subscription_key = "857b59237e77405cb60dbe0e1dfe46e7"
     endpoint = "https://api.cognitive.microsofttranslator.com"
     location = "westeurope"
@@ -55,13 +55,24 @@ def get_microsoft_translate(
     requested_text = request.text
     return ast.literal_eval(requested_text)[0]['translations'][0]['text']
 
-def get_and_preprocess_dataset(self):
-    if self.wsi_task == "wsi_2010":
-        path = wsi_2010_path
-    elif self.wsi_task == "wsi_2013":
-        path = wsi_2013_path
-    
-    df = pd.read_csv(path)
-    df['text'] = df['sentence'].apply(lambda x: ' '.join(ast.literal_eval(x)))
-    df['target_word'] = [ast.literal_eval(x)[int(i)] for i, x in zip(df.target_id, df.sentence)]
-    return df
+
+def get_official_google_translate(
+    text: str,
+    source_lang: Enum,
+    target_lang: Enum
+) -> str:
+    file_translation = "trans.js"
+    text = text.replace('\n', ' ').replace('\'', '\"')
+
+    template = f"""const translate = require('@iamtraction/google-translate');
+    translate(
+        '{text}',
+        {{from: '{source_lang}', to: '{target_lang}' }}).then(res => {{
+    console.log(res.text); }}).catch(err => {{
+    console.error(err);
+    }});
+    """
+    with open(file_translation, "w", encoding="utf-8") as f:
+        f.write(template)
+    response = muterun_js(file_translation)
+    return response.stdout.decode("utf-8")
