@@ -1,0 +1,1 @@
+npm install --save @iamtraction/google-translate
