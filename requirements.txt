@@ -4,3 +4,4 @@ itranslate
 easynmt
 Naked
 pandas
+langdetect

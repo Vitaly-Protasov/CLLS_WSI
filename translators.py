@@ -10,7 +10,7 @@ from Naked.toolshed.shell import muterun_js
 
 
 class Translations:
-    def __init__(self, easy_nmt_model: Optional[Enum]="opus-mt", device: Optional[Enum]=None):
+    def __init__(self, easy_nmt_model: Enum="opus-mt", device: Optional[Enum]=None):
         self.easynmt = self.get_easynmt_model(easy_nmt_model, device)
     
     def get_easynmt_model(
