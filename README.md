@@ -1,6 +1,6 @@
-# Neural Machine Translation with Alignment for Word Sense Induction tasks.
+# Neural Machine Translation with Alignment for Word Sense Induction tasks
 
-### Translation models
+## Translation models
 
 __If you want to know which languages are supported:__
 - [EasyNMT](https://github.com/UKPLab/EasyNMT#opus-mt)
@@ -9,3 +9,5 @@ __If you want to know which languages are supported:__
 - [GoogleUnofficialTranslate](https://github.com/ssut/py-googletrans)
 
 We also have some restrictions for language detection: [Supported Languages](https://github.com/Mimino666/langdetect#languages)
+
+## Alignment models
