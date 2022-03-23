@@ -13,4 +13,4 @@ We also have some restrictions for language detection: [Supported Languages](htt
 ## Word alignment models
 - [awesome-align](https://github.com/neulab/awesome-align)
 - [Word_Alignment_BERT](https://github.com/andreabac3/Word_Alignment_BERT)
-- 
+- [simalign](https://github.com/cisnlp/simalign)
