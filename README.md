@@ -1,4 +1,6 @@
-# Translation models
+# Neural Machine Translation with Alignment for Word Sense Induction tasks.
+
+### Translation models
 
 __If you want to know which languages are supported:__
 - [EasyNMT](https://github.com/UKPLab/EasyNMT#opus-mt)
