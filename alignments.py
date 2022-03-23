@@ -25,7 +25,7 @@ class Alignments:
             sentence1_w = self._clear_word(sentence1_w)
             sentence2_w = self._clear_word(sentence2_w)
             if sentence1_w == target_w:
-                start = sent2.find(sentence2_w)
+                start = sent_translated.find(sentence2_w)
                 end = start + len(sentence2_w)
                 return f'{start}-{end}', sentence2_w
         return f'{0}-{0}', ''
