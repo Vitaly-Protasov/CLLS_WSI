@@ -8,6 +8,8 @@ import pandas as pd
 from itranslate import itranslate
 from Naked.toolshed.shell import muterun_js
 
+import config
+
 
 class Translations:
     def __init__(self, easy_nmt_model: Enum="opus-mt", device: Optional[Enum]=None):
@@ -45,7 +47,7 @@ class Translations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        subscription_key = "857b59237e77405cb60dbe0e1dfe46e7"
+        subscription_key = 
         endpoint = "https://api.cognitive.microsofttranslator.com"
         location = "westeurope"
         path = '/translate'
