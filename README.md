@@ -1,7 +1,7 @@
 # Translation models
 
 __If you want to know which languages are supported:__
-- [EasyNMT](https://github.com/UKPLab/EasyNMT)
+- [EasyNMT](https://github.com/UKPLab/EasyNMT#opus-mt)
 - [MicrosoftTranslation](https://docs.microsoft.com/ru-ru/azure/cognitive-services/translator/language-support)
 - [GoogleOfficialTranslate](https://github.com/iamtraction/google-translate)
 - [GoogleUnofficialTranslate](https://github.com/ssut/py-googletrans)
