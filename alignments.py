@@ -1,13 +1,22 @@
-from WordAlignment import WordAlignment
 import transformers
 import re
 import itertools
 import torch
 from enum import Enum
+from typing import Optional, Tuple
+
+from WordAlignment import WordAlignment
 
 
 class Alignments:
-    def __init__(self, device: Enum, model_name: Enum = "bert-base-multilingual-cased"):
+    def __init__(
+        self,
+        model_name: Enum = "bert-base-multilingual-cased",
+        device: Optional[Enum]=None
+    ):
+        if device is None:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = device
         self.model_name = model_name
         self.model1 = WordAlignment(model_name=model_name, tokenizer_name=model_name, device=device, fp16=False)
         self.model2 = transformers.BertModel.from_pretrained(model_name)
@@ -16,7 +25,12 @@ class Alignments:
     def _clear_word(self, word: str) -> str:
         return re.sub(r'[^\w]', '', word.lower().strip())
     
-    def alignment_1(self, sent_original: str, sent_translated: str, target_w: str):
+    def alignment_1(
+        self,
+        sent_original: str,
+        sent_translated: str,
+        target_w: str
+    ) -> Tuple[str, str]:
         """
         Alignment from https://github.com/andreabac3/Word-Alignment-BERT
         """
@@ -30,7 +44,12 @@ class Alignments:
                 return f'{start}-{end}', sentence2_w
         return f'{0}-{0}', ''
 
-    def alignment_2(self, sent_original: str, sent_translated: str, target_w: str):
+    def alignment_2(
+        self,
+        sent_original: str,
+        sent_translated: str,
+        target_w: str
+    ) -> Tuple[str, str]:
         """
         Alignment from https://github.com/neulab/awesome-align
         """
@@ -42,7 +61,7 @@ class Alignments:
         self.tokenizer2.prepare_for_model(list(itertools.chain(*wid_tgt)), return_tensors='pt', truncation=True, model_max_length=self.tokenizer2.model_max_length)['input_ids']
 
         sub2word_map_src = []
-        for i, word_list in enumerate(token_src):
+        for i, word_list in enumerate(zip(token_src, token_tgt):
             sub2word_map_src += [i for x in word_list]
         sub2word_map_tgt = []
         for i, word_list in enumerate(token_tgt):
