@@ -20,7 +20,7 @@ class Alignments:
         self.device = device
         self.model_name = model_name
 
-        self.model1 = WordAlignment(model_name=model_name, tokenizer_name=model_name, device=device, fp16=False)
+        self.model1 = WordAlignment(model_name=model_name, tokenizer_name=model_name, device=self.device, fp16=False)
         self.model2 = transformers.BertModel.from_pretrained(model_name)
         self.tokenizer2 = transformers.BertTokenizer.from_pretrained(model_name)
         self.model3 = SentenceAligner(model="xlmr", token_type="word", device=device)

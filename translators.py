@@ -4,7 +4,7 @@ import requests, uuid
 import torch
 import ast
 from easynmt import EasyNMT
-import pandas as pd
+import os
 from itranslate import itranslate
 from Naked.toolshed.shell import muterun_js
 
@@ -90,4 +90,5 @@ class Translations:
         with open(file_translation, "w", encoding="utf-8") as f:
             f.write(template)
         response = muterun_js(file_translation)
+        os.remove(file_translation)
         return response.stdout.decode("utf-8")

@@ -1,8 +1,6 @@
 import pytest
 import unittest
-import pandas as pd
 from langdetect import detect
-from soupsieve import select
 
 from translators import Translations
 from utils import get_and_preprocess_dataset
@@ -71,4 +69,4 @@ class TestTranslators(unittest.TestCase):
         target_lang = "ru"
         translation = Translations.get_unofficial_google_translate(text, source_lang, target_lang)
         detected_lang = detect(translation)
-        return self.assertEqual(detected_lang, 'test')
+        return self.assertEqual(detected_lang, target_lang)
