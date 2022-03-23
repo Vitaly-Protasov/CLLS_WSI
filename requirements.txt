@@ -1,3 +1,6 @@
+torch==1.7.1
+transformers==4.11.3
 itranslate
 easynmt
 Naked
+pandas

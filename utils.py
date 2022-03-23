@@ -1,9 +1,11 @@
-from config import wsi_2010_path, wsi_2013_path
 import pandas as pd
 import ast
+from enum import Enum
+
+from config import wsi_2010_path, wsi_2013_path
 
 
-def get_and_preprocess_dataset(wsi_task):
+def get_and_preprocess_dataset(wsi_task: Enum) -> pd.DataFrame:
     if wsi_task == "wsi_2010":
         path = wsi_2010_path
     elif wsi_task == "wsi_2013":
