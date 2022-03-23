@@ -1,6 +1,6 @@
 # Translation models
 
-* 1) If you want to know which languages are supported:
+__If you want to know which languages are supported:__
 - [EasyNMT](https://github.com/UKPLab/EasyNMT)
 - [MicrosoftTranslation](https://docs.microsoft.com/ru-ru/azure/cognitive-services/translator/language-support)
 - [GoogleOfficialTranslate](https://github.com/iamtraction/google-translate)
