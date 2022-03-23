@@ -1,4 +1,4 @@
-# Neural Machine Translation with Alignment for Word Sense Induction tasks
+# Neural Machine Translation with Alignment for Word Sense Induction task
 
 ## Translation models
 
