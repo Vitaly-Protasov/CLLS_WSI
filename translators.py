@@ -47,7 +47,7 @@ class Translations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        subscription_key = 
+        subscription_key = config.azure_subscription_key
         endpoint = "https://api.cognitive.microsofttranslator.com"
         location = "westeurope"
         path = '/translate'
