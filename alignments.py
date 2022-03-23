@@ -7,6 +7,7 @@ from typing import Optional, Tuple, List
 from simalign import SentenceAligner
 
 from WordAlignment import WordAlignment
+from utils import clear_word
 
 
 class Alignments:
@@ -24,10 +25,6 @@ class Alignments:
         self.model2 = transformers.BertModel.from_pretrained(model_name)
         self.tokenizer2 = transformers.BertTokenizer.from_pretrained(model_name)
         self.model3 = SentenceAligner(model="xlmr", token_type="word", device=device)
-
-    
-    def _clear_word(self, word: str) -> str:
-        return re.sub(r'[^\w]', '', word.lower().strip())
     
     def alignment_bert(
         self,
@@ -43,8 +40,8 @@ class Alignments:
         possible_translations = []
         start = 0
         for sentence1_w, sentence2_w in decoded:
-            sentence1_w = self._clear_word(sentence1_w)
-            sentence2_w = self._clear_word(sentence2_w)
+            sentence1_w = clear_word(sentence1_w)
+            sentence2_w = clear_word(sentence2_w)
             if sentence1_w == target_w:
                 start_tw = sent_translated[start:].find(sentence2_w) + start 
                 end_tw = start_tw + len(sentence2_w)
@@ -96,8 +93,8 @@ class Alignments:
 
         possible_translations = []
         for i, j in align_words:
-            sentence1_w = self._clear_word(sent_src[i])
-            sentence2_w = self._clear_word(sent_tgt[j])
+            sentence1_w = clear_word(sent_src[i])
+            sentence2_w = clear_word(sent_tgt[j])
             if sentence1_w == target_w:
                 start_tw = sent_translated.find(sentence2_w)
                 end_tw = start_tw + len(sentence2_w)
@@ -122,8 +119,8 @@ class Alignments:
         possible_translations = []
         start = 0
         for sentence1_w_id, sentence2_w_id in decoded:
-            sentence1_w = self._clear_word(src_sentence[sentence1_w_id])
-            sentence2_w = self._clear_word(trg_sentence[sentence2_w_id])
+            sentence1_w = clear_word(src_sentence[sentence1_w_id])
+            sentence2_w = clear_word(trg_sentence[sentence2_w_id])
             if sentence1_w == target_w:
                 start_tw = sent_translated[start:].find(sentence2_w) + start 
                 end_tw = start_tw + len(sentence2_w)
