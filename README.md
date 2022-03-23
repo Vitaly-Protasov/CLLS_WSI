@@ -1,9 +1,9 @@
-# CLLS_WSI
+# Translation models
 
-Supports 55 languages out of the box ([ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)):
+* 1) If you want to know which languages are supported:
+- [EasyNMT](https://github.com/UKPLab/EasyNMT)
+- [MicrosoftTranslation](https://docs.microsoft.com/ru-ru/azure/cognitive-services/translator/language-support)
+- [GoogleOfficialTranslate](https://github.com/iamtraction/google-translate)
+- [GoogleUnofficialTranslate](https://github.com/ssut/py-googletrans)
 
-```
-af, ar, bg, bn, ca, cs, cy, da, de, el, en, es, et, fa, fi, fr, gu, he,
-hi, hr, hu, id, it, ja, kn, ko, lt, lv, mk, ml, mr, ne, nl, no, pa, pl,
-pt, ro, ru, sk, sl, so, sq, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh-cn, zh-tw
-```
+We also have some restrictions for language detection: [Supported Languages](https://github.com/Mimino666/langdetect#languages)
