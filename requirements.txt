@@ -5,3 +5,4 @@ easynmt
 Naked
 pandas
 langdetect
+simalign

@@ -1,4 +1,4 @@
-# Neural Machine Translation with Alignment for Word Sense Induction task
+# Neural Machine Translation with Word Alignment for Word Sense Induction Task
 
 ## Translation models
 
@@ -10,4 +10,7 @@ __If you want to know which languages are supported:__
 
 We also have some restrictions for language detection: [Supported Languages](https://github.com/Mimino666/langdetect#languages)
 
-## Alignment models
+## Word alignment models
+- [awesome-align](https://github.com/neulab/awesome-align)
+- [Word_Alignment_BERT](https://github.com/andreabac3/Word_Alignment_BERT)
+- 
