@@ -1,9 +1,9 @@
 import pytest
 import unittest
 
-from alignments import Alignments
-from translators import Translations
-from utils import get_and_preprocess_dataset
+from nmt_wsi.alignments import Alignments
+from nmt_wsi.translators import Translations
+from nmt_wsi.utils import get_and_preprocess_dataset
 
 
 @pytest.mark.alignments

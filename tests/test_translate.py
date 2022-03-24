@@ -2,8 +2,8 @@ import pytest
 import unittest
 from langdetect import detect
 
-from translators import Translations
-from utils import get_and_preprocess_dataset, clear_word
+from nmt_wsi.translators import Translations
+from nmt_wsi.utils import get_and_preprocess_dataset, clear_word
 
 
 @pytest.mark.translators
