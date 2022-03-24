@@ -1,8 +1,8 @@
 torch==1.7.1
 transformers==4.11.3
-itranslate
-easynmt
-Naked
-pandas
-langdetect
-simalign
+itranslate==0.1.1
+easynmt==2.0.1
+Naked==0.1.31
+pandas==1.3.5
+langdetect==1.0.9
+simalign==0.3
