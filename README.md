@@ -1,8 +1,13 @@
 # Neural Machine Translation with Word Alignment for Word Sense Induction Task
 
-## Translation models
+### Firstly
+```
+bash install.sh
+pip install -r requirements.txt
+```
 
-__If you want to know which languages are supported:__
+## Translation models
+__NMT models and languages they support:__
 - [EasyNMT](https://github.com/UKPLab/EasyNMT#opus-mt)
 - [MicrosoftTranslation](https://docs.microsoft.com/ru-ru/azure/cognitive-services/translator/language-support)
 - [GoogleOfficialTranslate](https://github.com/iamtraction/google-translate)
