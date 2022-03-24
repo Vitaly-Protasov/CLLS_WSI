@@ -38,3 +38,24 @@ class TestAlignment(unittest.TestCase):
         translated_text = Translations.get_official_google_translate(text, source_lang, target_lang)
         aligned_words = self.align.alignment_simalign(text, translated_text, target_word)
         return self.assertTrue(len(aligned_words) > 0)
+
+    def test4(self):
+        text = "My dog"
+        target_word = "dog"
+        translated_text = "Моя собака"
+        aligned_words = self.align.alignment_bert(text, translated_text, target_word)
+        return self.assertEqual(aligned_words[0][1], "собака")
+
+    def test5(self):
+        text = "My dog"
+        target_word = "dog"
+        translated_text = "Моя собака"
+        aligned_words = self.align.alignment_awesome(text, translated_text, target_word)
+        return self.assertEqual(aligned_words[0][1], "собака")
+
+    def test6(self):
+        text = "My dog"
+        target_word = "dog"
+        translated_text = "Моя собака"
+        aligned_words = self.align.alignment_simalign(text, translated_text, target_word)
+        return self.assertEqual(aligned_words[0][1], "собака")
