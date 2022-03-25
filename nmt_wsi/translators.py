@@ -9,15 +9,18 @@ import os
 from itranslate import itranslate
 from Naked.toolshed.shell import muterun_js
 import uuid
+from pathlib import Path
 
 from nmt_wsi import config
+
+
+translations_folder = "translations_js"
+os.makedirs(translations_folder, exist_ok=True)
 
 
 class Translations:
     def __init__(self, easy_nmt_model: Enum="opus-mt", device: Optional[Enum]=None):
         self.easynmt = self.get_easynmt_model(easy_nmt_model, device)
-        self.translations_folder = "translations_js"
-        os.makedirs(self.translations_folder, exist_ok=True)
     
     def get_easynmt_model(
         self,
@@ -80,7 +83,7 @@ class Translations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        file_translation = Path(self.translations_folder, f"{uuid.uuid4().hex}.js")
+        file_translation = Path(translations_folder, f"{uuid.uuid4().hex}.js")
         text = text.replace('\n', ' ').replace('\'', '\"')
 
         template = f"""const translate = require('@iamtraction/google-translate');
