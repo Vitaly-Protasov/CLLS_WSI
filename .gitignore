@@ -3,4 +3,4 @@ __pycache__
 .venv/
 *_env/
 .js
-translations_js/
+translation_files/
