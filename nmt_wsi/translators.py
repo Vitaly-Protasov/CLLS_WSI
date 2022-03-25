@@ -12,9 +12,9 @@ import uuid
 from pathlib import Path
 
 from nmt_wsi import config
+from nmt_wsi.utils import translations_folder
 
 
-translations_folder = "translations_js"
 os.makedirs(translations_folder, exist_ok=True)
 
 
