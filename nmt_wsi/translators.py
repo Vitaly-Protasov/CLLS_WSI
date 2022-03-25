@@ -7,6 +7,7 @@ from easynmt import EasyNMT
 import os
 from itranslate import itranslate
 from Naked.toolshed.shell import muterun_js
+import uuid
 
 from nmt_wsi import config
 
@@ -76,7 +77,7 @@ class Translations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        file_translation = "trans.js"
+        file_translation = f"{uuid.uuid4().hex}.js"
         text = text.replace('\n', ' ').replace('\'', '\"')
 
         template = f"""const translate = require('@iamtraction/google-translate');
