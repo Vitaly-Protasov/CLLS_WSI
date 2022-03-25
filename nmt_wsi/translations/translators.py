@@ -1,4 +1,3 @@
-from codecs import ignore_errors
 from typing import Union, List, Optional
 from enum import Enum
 import requests, uuid
@@ -17,7 +16,7 @@ from nmt_wsi import config
 os.makedirs(config.translations_folder, exist_ok=True)
 
 
-class Translations:
+class ClassTranslations:
     def __init__(self, easy_nmt_model: Enum="opus-mt", device: Optional[Enum]=None):
         self.easynmt = self.get_easynmt_model(easy_nmt_model, device)
     

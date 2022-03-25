@@ -2,7 +2,7 @@ import pytest
 import unittest
 from langdetect import detect
 
-from nmt_wsi.translators import Translations
+from nmt_wsi.translations.translators import ClassTranslations
 from nmt_wsi.utils import get_and_preprocess_dataset, clear_word
 
 
@@ -10,7 +10,7 @@ from nmt_wsi.utils import get_and_preprocess_dataset, clear_word
 class TestTranslators(unittest.TestCase):
     df1 = get_and_preprocess_dataset(wsi_task="wsi_2010")
     df2 = get_and_preprocess_dataset(wsi_task="wsi_2013")
-    translation_class = Translations(device="cpu")
+    translation_class = ClassTranslations(device="cpu")
 
     def test1(self):
         text = self.df1.text.to_list()[0]
@@ -31,14 +31,14 @@ class TestTranslators(unittest.TestCase):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_microsoft_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_microsoft_translate(text, source_lang, target_lang)
         return self.assertNotIn(translation, [None, ""])
 
     def test4(self):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_microsoft_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_microsoft_translate(text, source_lang, target_lang)
         detected_lang = detect(translation)
         return self.assertEqual(detected_lang, target_lang)
 
@@ -46,14 +46,14 @@ class TestTranslators(unittest.TestCase):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_official_google_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_official_google_translate(text, source_lang, target_lang)
         return self.assertNotIn(translation, [None, ""])
 
     def test6(self):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_official_google_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_official_google_translate(text, source_lang, target_lang)
         detected_lang = detect(translation)
         return self.assertEqual(detected_lang, target_lang)
 
@@ -61,14 +61,14 @@ class TestTranslators(unittest.TestCase):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_unofficial_google_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_unofficial_google_translate(text, source_lang, target_lang)
         return self.assertNotIn(translation, [None, ""])
 
     def test8(self):
         text = self.df1.text.to_list()[0]
         source_lang = "en"
         target_lang = "ru"
-        translation = Translations.get_unofficial_google_translate(text, source_lang, target_lang)
+        translation = ClassTranslations.get_unofficial_google_translate(text, source_lang, target_lang)
         detected_lang = detect(translation)
         return self.assertEqual(detected_lang, target_lang)
 

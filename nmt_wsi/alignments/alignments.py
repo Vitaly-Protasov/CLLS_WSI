@@ -5,11 +5,11 @@ from enum import Enum
 from typing import Optional, Tuple, List
 from simalign import SentenceAligner
 
-from nmt_wsi.WordAlignment import WordAlignment
+from nmt_wsi.alignments.WordAlignment import WordAlignment
 from nmt_wsi.utils import clear_word
 
 
-class Alignments:
+class ClassAlignments:
     def __init__(
         self,
         model_name: Enum = "bert-base-multilingual-cased",
