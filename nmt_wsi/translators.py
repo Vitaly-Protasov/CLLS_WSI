@@ -12,10 +12,9 @@ import uuid
 from pathlib import Path
 
 from nmt_wsi import config
-from nmt_wsi.utils import translations_folder
 
 
-os.makedirs(translations_folder, exist_ok=True)
+os.makedirs(config.translations_folder, exist_ok=True)
 
 
 class Translations:
@@ -83,7 +82,7 @@ class Translations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        file_translation = Path(translations_folder, f"{uuid.uuid4().hex}.js")
+        file_translation = str(Path(config.translations_folder, f"{uuid.uuid4().hex}.js"))
         text = text.replace('\n', ' ').replace('\'', '\"')
 
         template = f"""const translate = require('@iamtraction/google-translate');
