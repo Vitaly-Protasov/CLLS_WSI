@@ -16,6 +16,10 @@ from nmt_wsi import config
 os.makedirs(config.translations_folder, exist_ok=True)
 
 
+class UnknownLanguage(Exception):
+    pass
+
+
 class ClassTranslations:
     def __init__(self, easy_nmt_model: Enum="opus-mt", device: Optional[Enum]=None):
         self.easynmt = self.get_easynmt_model(easy_nmt_model, device)
@@ -36,7 +40,12 @@ class ClassTranslations:
         source_lang: Enum,
         target_lang: Enum
     ):
-        return self.easynmt.translate(texts, target_lang=target_lang, source_lang=source_lang)
+        try:
+            return self.easynmt.translate(texts, target_lang=target_lang, source_lang=source_lang)
+        except Exception as e:
+            error_text = str(e)
+            if error_text.startswith("404 Client Error"):
+                raise UnknownLanguage(f"Languages \"{target_lang}\" or \"{source_lang}\" are unknown.")
 
     @staticmethod
     def get_unofficial_google_translate(
@@ -44,7 +53,12 @@ class ClassTranslations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        return itranslate(text, from_lang=source_lang, to_lang=target_lang)
+        try:
+            return itranslate(text, from_lang=source_lang, to_lang=target_lang)
+        except Exception as e:
+            error_text = str(e)
+            if error_text.startswith("the JSON object must be str, bytes or bytearray"):
+                raise UnknownLanguage(f"Language \"{target_lang}\" is unknown.")
 
     @staticmethod
     def get_microsoft_translate(
@@ -73,7 +87,10 @@ class ClassTranslations:
         }]
         request = requests.post(constructed_url, params=params, headers=headers, json=body)
         requested_text = request.text
-        return ast.literal_eval(requested_text)[0]['translations'][0]['text']
+        try:
+            return ast.literal_eval(requested_text)[0]['translations'][0]['text']
+        except:
+            raise UnknownLanguage(f"Languages \"{target_lang}\" or \"{source_lang}\" are unknown.")
 
     @staticmethod
     def get_official_google_translate(
