@@ -5,7 +5,7 @@ import torch
 import ast
 from easynmt import EasyNMT
 import os
-from itranslate import itranslate
+from googletrans import Translator
 from Naked.toolshed.shell import muterun_js
 import uuid
 from pathlib import Path
@@ -17,6 +17,9 @@ os.makedirs(config.translations_folder, exist_ok=True)
 
 
 class UnknownLanguage(Exception):
+    pass
+
+class MicrosoftTranslationError(Exception):
     pass
 
 
@@ -54,11 +57,9 @@ class ClassTranslations:
         target_lang: Enum
     ) -> str:
         try:
-            return itranslate(text, from_lang=source_lang, to_lang=target_lang)
+            return Translator().translate(text, src=source_lang, dest=target_lang).text
         except Exception as e:
-            error_text = str(e)
-            if error_text.startswith("the JSON object must be str, bytes or bytearray"):
-                raise UnknownLanguage(f"Language \"{target_lang}\" is unknown.")
+            raise UnknownLanguage(str(e))
 
     @staticmethod
     def get_microsoft_translate(
@@ -90,7 +91,7 @@ class ClassTranslations:
         try:
             return ast.literal_eval(requested_text)[0]['translations'][0]['text']
         except:
-            raise UnknownLanguage(f"Languages \"{target_lang}\" or \"{source_lang}\" are unknown.")
+            raise MicrosoftTranslationError(f"Something went wrong in translation from \"{source_lang}\" to \"{target_lang}\".")
 
     @staticmethod
     def get_official_google_translate(
