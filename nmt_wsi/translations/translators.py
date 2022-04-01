@@ -56,10 +56,10 @@ class ClassTranslations:
         source_lang: Enum,
         target_lang: Enum
     ) -> str:
-        try:
-            return Translator().translate(text, src=source_lang, dest=target_lang).text
-        except Exception as e:
-            raise UnknownLanguage(str(e))
+        """
+        We advise not to translate using this function in multiprocessing manner.
+        """
+        return Translator().translate(text, src=source_lang, dest=target_lang).text
 
     @staticmethod
     def get_microsoft_translate(

@@ -37,15 +37,13 @@ class ClassAlignments:
         _, decoded = self.model1.get_alignment(sent_original.split(), sent_translated.split(), calculate_decode=True)
 
         possible_translations = []
-        start = 0
         for sentence1_w, sentence2_w in decoded:
             sentence1_w = clear_word(sentence1_w)
             sentence2_w = clear_word(sentence2_w)
             if sentence1_w == target_w:
-                start_tw = sent_translated[start:].find(sentence2_w) + start 
-                end_tw = start_tw + len(sentence2_w)
-                possible_translations.append((f'{start_tw}-{end_tw}', sentence2_w))
-            start += len(sentence1_w)
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
         return possible_translations
 
     def alignment_awesome(
@@ -95,9 +93,9 @@ class ClassAlignments:
             sentence1_w = clear_word(sent_src[i])
             sentence2_w = clear_word(sent_tgt[j])
             if sentence1_w == target_w:
-                start_tw = sent_translated.find(sentence2_w)
-                end_tw = start_tw + len(sentence2_w)
-                possible_translations.append((f'{start_tw}-{end_tw}', sentence2_w))
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
         return possible_translations
     
     def alignment_simalign(
@@ -116,13 +114,11 @@ class ClassAlignments:
         decoded = alignments['mwmf']
 
         possible_translations = []
-        start = 0
         for sentence1_w_id, sentence2_w_id in decoded:
             sentence1_w = clear_word(src_sentence[sentence1_w_id])
             sentence2_w = clear_word(trg_sentence[sentence2_w_id])
             if sentence1_w == target_w:
-                start_tw = sent_translated[start:].find(sentence2_w) + start 
-                end_tw = start_tw + len(sentence2_w)
-                possible_translations.append((f'{start_tw}-{end_tw}', sentence2_w))
-            start += len(sentence1_w)
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
         return possible_translations
