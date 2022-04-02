@@ -34,7 +34,11 @@ class ClassAlignments:
         """
         Alignment from https://github.com/andreabac3/Word-Alignment-BERT
         """
-        _, decoded = self.model1.get_alignment(sent_original.split(), sent_translated.split(), calculate_decode=True)
+        _, decoded = self.model1.get_alignment(
+            sent_original.strip().lower().split(),
+            sent_translated.strip().lower().split(),
+            calculate_decode=True
+            )
 
         possible_translations = []
         for sentence1_w, sentence2_w in decoded:
@@ -56,7 +60,7 @@ class ClassAlignments:
         Alignment from https://github.com/neulab/awesome-align
         """
 
-        sent_src, sent_tgt = sent_original.strip().split(), sent_translated.strip().split()
+        sent_src, sent_tgt = sent_original.strip().lower().split(), sent_translated.strip().lower().split()
         token_src, token_tgt = [self.tokenizer2.tokenize(word) for word in sent_src], [self.tokenizer2.tokenize(word) for word in sent_tgt]
         wid_src, wid_tgt = [self.tokenizer2.convert_tokens_to_ids(x) for x in token_src], [self.tokenizer2.convert_tokens_to_ids(x) for x in token_tgt]
         ids_src, ids_tgt = self.tokenizer2.prepare_for_model(list(itertools.chain(*wid_src)), \
@@ -107,8 +111,8 @@ class ClassAlignments:
         """
         Alignment from https://github.com/cisnlp/simalign
         """
-        src_sentence = sent_original.split()
-        trg_sentence = sent_translated.split()
+        src_sentence = sent_original.strip().lower().split()
+        trg_sentence = sent_translated.strip().lower().split()
 
         alignments = self.model3.get_word_aligns(src_sentence, trg_sentence)
         decoded = alignments['mwmf']
