@@ -1,76 +1,124 @@
-from typing import List, Tuple
-
+import transformers
+import itertools
 import torch
-from torch.nn.functional import cosine_similarity
-from torch_scatter import scatter_mean
-from transformers import AutoModel, AutoTokenizer
+from enum import Enum
+from typing import Optional, Tuple, List
+from simalign import SentenceAligner
+
+from nmt_wsi.alignments.WordAlignment import WordAlignment
+from nmt_wsi.utils import clear_word
 
 
-class WordAlignment:
-    def __init__(self, model_name: str, tokenizer_name: str, device: str, fp16: bool):
-        assert (device == 'cpu' and not fp16) or (device != 'cpu'), "You can't use fp16 with CPU device."
-        self.model: AutoModel = AutoModel.from_pretrained(model_name, output_hidden_states=True).to(device)
-        self.tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-        self.model.eval()
-        if fp16:
-            self.model = self.model.half()
+class ClassAlignments:
+    def __init__(
+        self,
+        model_name: Enum = "bert-base-multilingual-cased",
+        device: Optional[Enum]=None
+    ):
+        if device is None:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = device
+        self.model_name = model_name
 
-    def bert_tokenizer(self, sentence: List[str]):
-        sentence_tokenized = self.tokenizer(" ".join(sentence), return_tensors="pt", padding=True, truncation=True).to(self.model.device)
-        indices: List[int] = self.indices_word_pieces(sentence)
-        return sentence_tokenized, indices[:sentence_tokenized['input_ids'].size(-1)]
+        self.model1 = WordAlignment(model_name=model_name, tokenizer_name=model_name, device=self.device, fp16=False)
+        self.model2 = transformers.BertModel.from_pretrained(model_name)
+        self.tokenizer2 = transformers.BertTokenizer.from_pretrained(model_name)
+        self.model3 = SentenceAligner(model="xlmr", token_type="word", device=self.device)
+    
+    def alignment_bert(
+        self,
+        sent_original: str,
+        sent_translated: str,
+        target_w: str
+    ) -> List[Tuple[str, str]]:
+        """
+        Alignment from https://github.com/andreabac3/Word-Alignment-BERT
+        """
+        _, decoded = self.model1.get_alignment(sent_original.split(), sent_translated.split(), calculate_decode=True)
 
-    def get_sentence_representation(self, sentence: List[str]) -> torch.Tensor:
-        encoded_input, indices = self.bert_tokenizer(sentence)
-        out_bert: torch.Tensor = self.bert_forward(encoded_input)
-        return scatter_mean(out_bert, index=torch.LongTensor(indices[:out_bert.size(1)]).to(self.model.device), dim=1)
+        possible_translations = []
+        for sentence1_w, sentence2_w in decoded:
+            sentence1_w = clear_word(sentence1_w)
+            sentence2_w = clear_word(sentence2_w)
+            if sentence1_w == target_w:
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
+        return possible_translations
 
-    @staticmethod
-    def obtain_cosine_similarity_matrix(source, target):
-        return cosine_similarity(source[..., None, :, :], target[..., :, None, :], dim=-1)[0]
+    def alignment_awesome(
+        self,
+        sent_original: str,
+        sent_translated: str,
+        target_w: str
+    ) -> Tuple[str, str]:
+        """
+        Alignment from https://github.com/neulab/awesome-align
+        """
 
-    def indices_word_pieces(self, sentence: List[str]) -> List[int]:
-        indices = []
-        for idx_word, word in enumerate(sentence):
-            word_tokenized = self.tokenizer.tokenize(word)
-            for _ in range(len(word_tokenized)):
-                indices.append(idx_word)
-        return indices
+        sent_src, sent_tgt = sent_original.strip().split(), sent_translated.strip().split()
+        token_src, token_tgt = [self.tokenizer2.tokenize(word) for word in sent_src], [self.tokenizer2.tokenize(word) for word in sent_tgt]
+        wid_src, wid_tgt = [self.tokenizer2.convert_tokens_to_ids(x) for x in token_src], [self.tokenizer2.convert_tokens_to_ids(x) for x in token_tgt]
+        ids_src, ids_tgt = self.tokenizer2.prepare_for_model(list(itertools.chain(*wid_src)), \
+                                                             return_tensors='pt', model_max_length=self.tokenizer2.model_max_length, truncation=True)['input_ids'],\
+        self.tokenizer2.prepare_for_model(list(itertools.chain(*wid_tgt)), return_tensors='pt', truncation=True, model_max_length=self.tokenizer2.model_max_length)['input_ids']
 
-    def __repr__(self):
-        return f"Bert Model: {self.model.name_or_path} Device: {self.model.device}"
+        sub2word_map_src = []
+        for i, word_list in enumerate(token_src):
+            sub2word_map_src += [i for x in word_list]
+        sub2word_map_tgt = []
+        for i, word_list in enumerate(token_tgt):
+            sub2word_map_tgt += [i for x in word_list]
 
-    @staticmethod
-    def mean_pooling_strategy(bert_output: Tuple[torch.Tensor], dimension: int = 4):
-        return torch.mean(torch.stack(bert_output[:-dimension], dim=-1), dim=-1)[:, 1:-1, :]
-
-    def bert_forward(self, encoded_sentence) -> torch.Tensor:
+        # alignment
+        align_layer = 8
+        threshold = 1e-3
+        self.model2.eval()
         with torch.no_grad():
-            bert_output: Tuple[torch.Tensor] = self.model(**encoded_sentence)["hidden_states"]
-            return self.mean_pooling_strategy(bert_output)
+            out_src = self.model2(ids_src.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
+            out_tgt = self.model2(ids_tgt.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
+            
+            dot_prod = torch.matmul(out_src, out_tgt.transpose(-1, -2))
+            softmax_srctgt = torch.nn.Softmax(dim=-1)(dot_prod)
+            softmax_tgtsrc = torch.nn.Softmax(dim=-2)(dot_prod)
+            softmax_inter = (softmax_srctgt > threshold)*(softmax_tgtsrc > threshold)
 
-    @staticmethod
-    def pad_sentence(source: List[str], target: List[str]) -> None:
-        diff = abs(len(source) - len(target))
-        if diff == 0:
-            return
-        pad_vector: List[str] = ["[PAD]" for _ in range(diff)]
-        if len(source) > len(target):
-            target.extend(pad_vector)
-        if len(target) > len(source):
-            source.extend(pad_vector)
+        align_subwords = torch.nonzero(softmax_inter, as_tuple=False)
+        align_words = set()
+        for i, j in align_subwords:
+            align_words.add((sub2word_map_src[i], sub2word_map_tgt[j]))
 
-    def decode(self, indices_align: torch.Tensor, sentence1: List[str], sentence2: List[str]) -> List[List[str]]:
-        return [[word, sentence2[idx]] for idx, word in zip(indices_align, sentence1)]
+        possible_translations = []
+        for i, j in align_words:
+            sentence1_w = clear_word(sent_src[i])
+            sentence2_w = clear_word(sent_tgt[j])
+            if sentence1_w == target_w:
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
+        return possible_translations
+    
+    def alignment_simalign(
+        self,
+        sent_original: str,
+        sent_translated: str,
+        target_w: str
+    ) -> Tuple[str, str]:
+        """
+        Alignment from https://github.com/cisnlp/simalign
+        """
+        src_sentence = sent_original.split()
+        trg_sentence = sent_translated.split()
 
-    def get_alignment(self, first_sentence: List[str], second_sentence: List[str], calculate_decode: bool = True) -> Tuple[List[int], List[List[str]]]:
-        len_sentence1 = len(first_sentence)
-        sentence1 = first_sentence.copy()
-        sentence2 = second_sentence.copy()
-        # self.pad_sentence(sentence1, sentence2)
-        sentence1_vector: torch.Tensor = self.get_sentence_representation(sentence1)
-        sentence2_vector: torch.Tensor = self.get_sentence_representation(sentence2)
-        cosine_similarity_matrix: torch.Tensor = self.obtain_cosine_similarity_matrix(sentence1_vector, sentence2_vector)
-        indices_align: torch.Tensor = torch.argmax(cosine_similarity_matrix.T, dim=-1)
-        decoded: List[List[str]] = self.decode(indices_align, sentence1, sentence2)[:len_sentence1] if calculate_decode else None
-        return indices_align[:len_sentence1], decoded
+        alignments = self.model3.get_word_aligns(src_sentence, trg_sentence)
+        decoded = alignments['mwmf']
+
+        possible_translations = []
+        for sentence1_w_id, sentence2_w_id in decoded:
+            sentence1_w = clear_word(src_sentence[sentence1_w_id])
+            sentence2_w = clear_word(trg_sentence[sentence2_w_id])
+            if sentence1_w == target_w:
+                possible_translations.append(sentence2_w)
+        if len(possible_translations) == 0:
+            possible_translations.append('')
+        return possible_translations
